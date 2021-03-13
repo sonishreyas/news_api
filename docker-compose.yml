@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+    news_data:
+      build:
+        context: ./app 
+        dockerfile: Dockerfile
+      command: flask run
+      volumes:
+        - ./app:/home/app
+        - ./configs:/home/app/configs
+      expose:
+        - 5000
+      environment:
+        - TABLE_NAME=news_data
+        - FLASK_RUN_PORT=5000
+      env_file:
+        - ./configs/.env.dev
+    
+    nginx:
+      image: nginx:1.19.0-alpine
+      volumes:
+        - ./configs/nginx-prod:/etc/nginx/conf.d
+      ports:
+        - 80:80
+      depends_on:
+        - news_data
+        

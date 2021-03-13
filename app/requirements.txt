@@ -1,0 +1,5 @@
+flask==1.1.2
+python-dotenv
+gunicorn==20.0.4
+grpcio==1.35.0
+pymongo
