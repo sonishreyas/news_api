@@ -48,7 +48,7 @@ def ingest():
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
         received_json_data = json.loads(request.data)
-        status = mongoWrapper.ingest_data(received_json_data)
+        status = mongoWrapper.ingest_data(data=received_json_data)
         return jsonify({'ip': user_ip,
                         'succeeded': status,
                         }), 200
@@ -60,5 +60,5 @@ def get_data():
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
         received_json_data = json.loads(request.data)
-        result = mongoWrapper.get_data(received_json_data)
+        result = mongoWrapper.get_data(search=received_json_data)
         return jsonify(result), 200
