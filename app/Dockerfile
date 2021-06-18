@@ -1,21 +1,28 @@
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.6-slim-buster
 
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE 1
 
-# Alpine comes with ash as the default shell instead of bash.
-RUN apk add --no-cache --upgrade bash
-RUN apk add --no-cache --update gcc py3-pip libffi-dev gcc g++ musl-dev make py-gevent linux-headers python3-dev build-base
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED 1
 
-# FROM python:3.7-slim
+# Install pip requirements
+ADD requirements.txt .
+RUN python -m pip install -r requirements.txt
 
+WORKDIR /app
+ADD . /app
 
-RUN mkdir /home/app
-WORKDIR /home/app
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+# Switching to a non-root user, please refer to https://aka.ms/vscode-docker-python-user-rights
+# RUN useradd appuser && chown -R appuser /app
+# USER appuser
+# RUN chown appuser:appuser -R /app/
 
-COPY . .
-# RUN adduser app
-# RUN chown -R app:app /home/app
+RUN export PYTHONPATH="/app"
+# RUN export GOOGLE_APPLICATION_CREDENTIALS="/app/src/configs/key.json"
+# ENV GOOGLE_APPLICATION_CREDENTIALS="/app/src/configs/key.json"
+ENV PYTHONPATH="/app"
 
 # USER app
 RUN chmod +x run_api.sh

@@ -4,7 +4,7 @@ from os import environ
 from flask import Flask, json
 from flask import jsonify
 from flask import request
-from flask.cli import load_dotenv
+from dotenv import load_dotenv
 from AppUtil import AppUtil
 from wrapper import MongoWrapper
 from RateLimiter import RateLimiter
@@ -20,7 +20,8 @@ class DataBackendFlaskApp(Flask):
 app = DataBackendFlaskApp(__name__)  
 app.run()
 
-load_dotenv('/home/ubuntu/BE/news_api/configs/.env.dev')
+load_dotenv('../app/configs/.env.prod')
+print("SESSION_WINDOW_IN_SECONDS = ", environ.get('SESSION_WINDOW_IN_SECONDS'))
 SESSION_WINDOW_IN_SECONDS = int(environ.get('SESSION_WINDOW_IN_SECONDS'))
 MAX_REQUEST = int(environ.get('MAX_REQUEST'))
 
@@ -55,10 +56,11 @@ def ingest():
 
     return "More than 10 requests originated from this IP in last 10 seconds. Please wait few seconds before you try again."
 
-@app.route("/get_data", methods=["POST"])
+@app.route("/get_data", methods=["GET"])
 def get_data():
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
         received_json_data = json.loads(request.data)
-        result = mongoWrapper.get_data(search=received_json_data)
+        received_json_data['is_summarized'] = 1
+        result = mongoWrapper.get_data(collection_name= "articles",search=received_json_data)
         return jsonify(result), 200
