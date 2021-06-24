@@ -20,7 +20,7 @@ class DataBackendFlaskApp(Flask):
 app = DataBackendFlaskApp(__name__)  
 app.run()
 
-load_dotenv('../app/configs/.env.prod')
+# load_dotenv('../app/configs/.env.prod')
 print("SESSION_WINDOW_IN_SECONDS = ", environ.get('SESSION_WINDOW_IN_SECONDS'))
 SESSION_WINDOW_IN_SECONDS = int(environ.get('SESSION_WINDOW_IN_SECONDS'))
 MAX_REQUEST = int(environ.get('MAX_REQUEST'))
