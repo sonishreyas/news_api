@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
     news_data:
-      build: ./app
+      image: sonishreyas/news-data:latest
       command: flask run
       volumes:
         - ./app:/home/app
@@ -24,7 +24,7 @@ services:
             memory: 75M
 
     nginx:
-      image: nginx:1.19.0-alpine
+      image: nginx:1.17.10
       volumes:
         - ./configs/nginx-prod-cors:/etc/nginx/conf.d
       ports:
