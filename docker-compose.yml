@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
     news_data:
-      image: sonishreyas/news-data:latest
+      build: ./app
       command: flask run
       volumes:
         - ./app:/home/app

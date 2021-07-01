@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from AppUtil import AppUtil
 from wrapper import MongoWrapper
 from RateLimiter import RateLimiter
+from flask_cors import CORS, cross_origin
 
 class DataBackendFlaskApp(Flask):
     def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
@@ -18,9 +19,11 @@ class DataBackendFlaskApp(Flask):
 
 
 app = DataBackendFlaskApp(__name__)  
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.run()
 
-# load_dotenv('../app/configs/.env.prod')
+load_dotenv('../app/configs/.env.prod')
 print("SESSION_WINDOW_IN_SECONDS = ", environ.get('SESSION_WINDOW_IN_SECONDS'))
 SESSION_WINDOW_IN_SECONDS = int(environ.get('SESSION_WINDOW_IN_SECONDS'))
 MAX_REQUEST = int(environ.get('MAX_REQUEST'))
@@ -30,6 +33,7 @@ rate_limiter = RateLimiter(SESSION_WINDOW_IN_SECONDS, MAX_REQUEST)
 mongoWrapper = MongoWrapper()
 
 @app.route("/create_collection", methods=["POST"])
+@cross_origin()
 def create_collection():
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
@@ -45,6 +49,7 @@ def create_collection():
 
 
 @app.route("/ingest", methods=["POST"])
+@cross_origin()
 def ingest():
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
@@ -58,9 +63,44 @@ def ingest():
 
 @app.route("/get_data", methods=["GET"])
 def get_data():
+    topic = request.args.get("topic","")
     user_ip = app_util.get_ip(request)
     if rate_limiter.allow(user_ip):
-        received_json_data = json.loads(request.data)
+
+        try:
+            received_json_data = json.loads(request.data)
+        except:
+            received_json_data = {}
         received_json_data['is_summarized'] = 1
+        if topic != "":
+            received_json_data['topic'] = topic
+        
         result = mongoWrapper.get_data(collection_name= "articles",search=received_json_data)
-        return jsonify(result), 200
+        response = jsonify(result)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+@app.route("/get_data_by_language", methods=["GET"])
+def get_data_by_language():
+    topic = request.args.get("topic","")
+    language = request.args.get("language","English")
+    user_ip = app_util.get_ip(request)
+    if rate_limiter.allow(user_ip):
+
+        try:
+            received_json_data = json.loads(request.data)
+        except:
+            received_json_data = {}
+        if language == "English":
+            language = ""
+        else:
+            language += "_"
+
+        received_json_data['is_summarized'] = 1
+        if topic != "":
+            received_json_data['topic'] = topic
+        
+        result = mongoWrapper.get_data_by_language(collection_name= "articles",search=received_json_data,language=language)
+        response = jsonify(result)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response

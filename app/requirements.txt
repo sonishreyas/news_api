@@ -3,3 +3,4 @@ python-dotenv
 gunicorn==20.0.4
 grpcio==1.35.0
 pymongo
+Flask-Cors==3.0.10
