@@ -29,6 +29,6 @@ class MongoWrapper():
     def get_data_by_language(self, collection_name, search={},language=""):
         collection = getattr(self.mydb, collection_name)
         result = []
-        for post in collection.find(search,{f"{language}title":1,f"{language}summary":1,"time":1,"_id":0}).sort("time",-1):
+        for post in collection.find(search,{f"{language}title":1,f"{language}summary":1,"time":1,"_id":0,"url":1}).sort("time",-1):
             result.append(post)
         return result
