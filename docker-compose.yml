@@ -1,42 +1,41 @@
 version: '3.7'
 
 services:
-    news_data:
-      build: ./app
-      command: flask run
-      volumes:
-        - ./app:/home/app
-        - ./configs:/home/app/configs
-      expose:
-        - 5000
-      environment:
-        - FLASK_RUN_PORT=5000
-      env_file:
-        - ./configs/.env.dev
-      restart: always 
-      deploy:
-        resources:
-          limits:
-            cpus: 0.20
-            memory: 200M
-          reservations:
-            cpus: 0.10
-            memory: 75M
+  news:
+    # image: sonishreyas/news-api
+    build: ./app
+    command: ./run_api.sh
+    volumes:
+      - ./app:/home/app
+      - ./configs:/home/app/configs
+    expose:
+      - 5000
+    env_file:
+      - ./configs/.env
+    restart: always 
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 200M
+        reservations:
+          cpus: "0.10"
+          memory: 75M
 
-    nginx:
-      image: nginx:1.17.10
-      volumes:
-        - ./configs/nginx-prod-cors:/etc/nginx/conf.d
-      ports:
-        - 80:80
-      depends_on:
-        - news_data
-      restart: always
-      deploy:
-        resources:
-          limits:
-            cpus: 0.20
-            memory: 200M
-          reservations:
-            cpus: 0.10
-            memory: 75M
+  nginx:
+    image: nginx:1.19.0-alpine
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - 80:80
+    depends_on:
+      - news
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 200M
+        reservations:
+          cpus: "0.10"
+          memory: 75M

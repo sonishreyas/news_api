@@ -23,7 +23,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.run()
 
-load_dotenv('../app/configs/.env.prod')
+load_dotenv('../app/configs/.env.dev')
 print("SESSION_WINDOW_IN_SECONDS = ", environ.get('SESSION_WINDOW_IN_SECONDS'))
 SESSION_WINDOW_IN_SECONDS = int(environ.get('SESSION_WINDOW_IN_SECONDS'))
 MAX_REQUEST = int(environ.get('MAX_REQUEST'))
