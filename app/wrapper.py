@@ -7,9 +7,10 @@ class MongoWrapper():
 
     def __init__(self):
         load_dotenv('../app/configs/.env.dev')
-        self.client = MongoClient(f"mongodb://{environ.get('MONGO_USER')}:{environ.get('MONGO_PWD')}@{environ.get('MONGO_IP')}:{environ.get('MONGO_PORT')}/{environ.get('MONGO_DATABASE')}",authSource=environ.get("MONGO_DATABASE_AUTHENTICATION")) 
+        # self.client = MongoClient(f"mongodb://{environ.get('MONGO_USER')}:{environ.get('MONGO_PWD')}@{environ.get('MONGO_IP')}:{environ.get('MONGO_PORT')}/{environ.get('MONGO_DATABASE')}",authSource=environ.get("MONGO_DATABASE_AUTHENTICATION")) 
+        # self.mydb = self.client[environ.get("MONGO_DATABASE")]
+        self.client =  MongoClient(f'mongodb://{environ.get("MONGO_IP")}:{environ.get("MONGO_PORT")}/')  
         self.mydb = self.client[environ.get("MONGO_DATABASE")]
-
     def create_collection(self,name):
         mycol = self.mydb[name]
         return True
